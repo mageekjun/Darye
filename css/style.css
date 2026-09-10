@@ -165,9 +165,11 @@ header.top .row{
 .tea-thumb{
   height:96px; display:flex; align-items:center; justify-content:center; font-size:2.1rem;
   background: var(--accent-light, var(--brand-light)); color: var(--accent, var(--brand));
-  position:relative;
+  position:relative; overflow:hidden;
 }
-.tea-thumb .match-badge{ position:absolute; top:8px; right:8px; }
+.tea-thumb .thumb-emoji{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; }
+.tea-thumb img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+.tea-thumb .match-badge{ position:absolute; top:8px; right:8px; z-index:1; }
 .tea-body{ padding:14px; display:flex; flex-direction:column; gap:6px; }
 .tea-card .name{ font-family:'Noto Serif KR',serif; font-weight:600; font-size:.96rem; }
 .tea-card .origin{ font-size:.72rem; color:var(--muted); }
@@ -207,10 +209,13 @@ header.top .row{
 
 .detail-head{ text-align:left; }
 .thumb-icon{
+  position:relative; overflow:hidden;
   display:inline-flex; align-items:center; justify-content:center; width:52px; height:52px;
   border-radius:14px; font-size:1.6rem; margin-bottom:10px;
   background: var(--accent-light, var(--brand-light)); color: var(--accent, var(--brand));
 }
+.thumb-icon .thumb-emoji{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; }
+.thumb-icon img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
 .detail-head .name{ font-family:'Noto Serif KR',serif; font-size:1.35rem; }
 .detail-head .origin{ color:var(--muted); font-size:.85rem; margin-top:4px; }
 .detail-head .match-badge{ margin-top:10px; display:inline-block; }

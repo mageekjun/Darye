@@ -123,8 +123,9 @@
     el.addEventListener("click", ()=> openDetail(tea.id));
     const style = applyCategoryStyle(el, tea.category);
     const badge = showMatch ? `<span class="match-badge">${matchPercent(tea)}% 일치</span>` : "";
+    const photo = tea.image ? `<img src="${tea.image}" alt="" loading="lazy" onerror="this.remove()">` : "";
     el.innerHTML = `
-      <div class="tea-thumb" aria-hidden="true">${style.icon}${badge}</div>
+      <div class="tea-thumb" aria-hidden="true"><span class="thumb-emoji">${style.icon}</span>${photo}${badge}</div>
       <div class="tea-body">
         <div class="name">${tea.name}</div>
         <div class="origin">${tea.origin}</div>
@@ -253,7 +254,9 @@
     if(!tea) return;
     const iconEl = $("#detail-icon");
     const style = applyCategoryStyle(iconEl, tea.category);
-    iconEl.textContent = style.icon;
+    iconEl.innerHTML = tea.image
+      ? `<span class="thumb-emoji">${style.icon}</span><img src="${tea.image}" alt="" loading="lazy" onerror="this.remove()">`
+      : style.icon;
     $("#detail-name").textContent = tea.name;
     $("#detail-origin").textContent = tea.origin + " · " + tea.category;
     $("#detail-match").textContent = profile ? `${matchPercent(tea)}% 일치` : "취향 미설정";
