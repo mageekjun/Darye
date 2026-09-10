@@ -32,6 +32,15 @@ function commonsUrl(filename, width){
   return `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(filename)}?width=${width || 600}`;
 }
 
+function formatWon(price){
+  return price.toLocaleString("ko-KR") + "원";
+}
+
+// 목록 카드에 쓰는 기준가 — 가장 싼 용량의 가격
+function basePrice(tea){
+  return Math.min(...tea.options.map(o => o.price));
+}
+
 function applyCategoryStyle(el, category){
   const s = CATEGORY_STYLE[category] || { icon:"🍵", accent:"#2e5339", light:"#e4ece3" };
   el.style.setProperty("--accent", s.accent);
@@ -84,7 +93,7 @@ function teaCardEl(tea, profile){
         <span class="tag">${tea.category}</span>
         <span class="tag">${CAFFEINE_LABEL[tea.caffeine]}</span>
       </div>
-      <div class="tea-price">${tea.price} · ${tea.weight}</div>
+      <div class="tea-price">${formatWon(basePrice(tea))} <span class="price-from">부터</span></div>
     </div>
   `;
   return el;

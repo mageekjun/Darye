@@ -69,9 +69,15 @@
         <div class="buy-origin">${tea.origin}</div>
         ${profile ? `<div class="buy-match"><span class="match-badge">${matchPercent(tea, profile)}% 일치</span></div>` : ""}
         <div class="buy-effect">${tea.effect}</div>
+        <div class="option-block">
+          <label class="option-label" for="opt-weight">용량</label>
+          <select class="option-select" id="opt-weight">
+            ${tea.options.map((o,i) => `<option value="${i}">${o.weight} · ${formatWon(o.price)}</option>`).join("")}
+          </select>
+        </div>
         <div class="buy-price-row">
-          <span class="buy-price">${tea.price}</span>
-          <span class="buy-weight">${tea.weight} 기준</span>
+          <span class="buy-price" id="buy-price">${formatWon(tea.options[0].price)}</span>
+          <span class="buy-weight" id="buy-weight">${tea.options[0].weight}</span>
         </div>
         <div class="buy-cta-row">
           <button type="button" class="scrap-toggle" data-action="scrap" aria-pressed="${isScrapped(tea.id)?"true":"false"}">${isScrapped(tea.id) ? "🔖 찜함" : "🔖 찜하기"}</button>
@@ -89,8 +95,7 @@
         <tr><td>맛 특징</td><td>${tea.taste.map(t=>TASTE_LABEL[t]).join(", ")}</td></tr>
         <tr><td>카페인</td><td>${CAFFEINE_LABEL[tea.caffeine]}</td></tr>
         <tr><td>우리는 법</td><td>${tea.brew}</td></tr>
-        <tr><td>용량</td><td>${tea.weight}</td></tr>
-        <tr><td>가격대</td><td>${tea.price}</td></tr>
+        <tr><td>용량·가격</td><td>${tea.options.map(o => `${o.weight} ${formatWon(o.price)}`).join(" / ")}</td></tr>
       </table>
       <div class="story">${tea.story}</div>
     `;
@@ -116,6 +121,18 @@
   render();
 
   // ---------------- WIRE UP ----------------
+  function selectedOption(){
+    const sel = $("#opt-weight");
+    return tea.options[sel ? Number(sel.value) : 0];
+  }
+
+  document.addEventListener("change", (e)=>{
+    if(e.target.id !== "opt-weight") return;
+    const opt = selectedOption();
+    $("#buy-price").textContent = formatWon(opt.price);
+    $("#buy-weight").textContent = opt.weight;
+  });
+
   document.addEventListener("click", (e)=>{
     const thumb = e.target.closest(".gallery-thumb");
     if(thumb){
@@ -126,7 +143,8 @@
     const action = e.target.closest("[data-action]");
     if(!action) return;
     if(action.getAttribute("data-action") === "buy"){
-      toast("MVP 테스트 단계입니다 — 구매 연동은 다음 버전에서 제공돼요");
+      const opt = selectedOption();
+      toast(`${opt.weight} ${formatWon(opt.price)} — 구매 연동은 다음 버전에서 제공돼요`);
     }
     if(action.getAttribute("data-action") === "scrap"){
       const scrapped = toggleScrap(tea.id);
