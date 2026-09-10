@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>로그인 · 회원가입 — 다례(茶禮)</title>
+<meta name="description" content="닉네임만으로 시작하는 다례 체험용 계정.">
+<link rel="icon" href="favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nanum+Brush+Script&family=Noto+Serif+KR:wght@500;600;700&family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body data-page="login">
+
+<main>
+  <div class="auth-page">
+    <div class="auth-card">
+      <div class="auth-lockup">
+        <img class="light-only" src="assets/logo-lockup.png" width="420" height="689" alt="다례 茶禮">
+        <img class="dark-only" src="assets/logo-lockup-dark.png" width="420" height="689" alt="" aria-hidden="true">
+      </div>
+
+      <div class="auth-tabs" id="auth-tabs" role="tablist">
+        <button type="button" role="tab" data-mode="login" aria-pressed="true">로그인</button>
+        <button type="button" role="tab" data-mode="signup" aria-pressed="false">회원가입</button>
+      </div>
+
+      <form class="auth-form" id="auth-form" novalidate>
+        <label class="auth-label" for="nickname">닉네임</label>
+        <input type="text" id="nickname" name="nickname" maxlength="12" autocomplete="off"
+               placeholder="2~12자" aria-describedby="auth-msg">
+        <p class="auth-msg" id="auth-msg" role="status"></p>
+        <button type="submit" class="btn primary auth-submit" id="auth-submit">다례 시작하기</button>
+      </form>
+
+      <p class="auth-note">
+        MVP 테스트 단계라 <strong>비밀번호를 받지 않습니다.</strong>
+        닉네임은 이 브라우저에만 저장되고 서버로 전송되지 않으며, 실제 회원 인증이 아닙니다.
+      </p>
+    </div>
+  </div>
+</main>
+
+<script src="js/data.js"></script>
+<script src="js/common.js"></script>
+<script src="js/layout.js"></script>
+<script src="js/login.js"></script>
+</body>
+</html>

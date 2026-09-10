@@ -87,6 +87,56 @@ function rankedTeas(profile){
   return TEAS.slice().sort((a,b)=> scoreTea(b, profile) - scoreTea(a, profile));
 }
 
+// ---------------- 체험용 계정 ----------------
+// MVP 테스트용이라 비밀번호를 받지 않는다. 닉네임만 이 브라우저에 저장하며
+// 실제 인증이 아니므로 서버로 전송되는 정보도 없다.
+function getAccounts(){
+  try{ return JSON.parse(localStorage.getItem("dahye_accounts") || "[]"); }catch(e){ return []; }
+}
+function saveAccounts(list){
+  try{ localStorage.setItem("dahye_accounts", JSON.stringify(list)); }catch(e){}
+}
+function currentUser(){
+  let id = null;
+  try{ id = localStorage.getItem("dahye_session"); }catch(e){ return null; }
+  if(!id) return null;
+  return getAccounts().find(a => a.id === id) || null;
+}
+function validateNickname(nickname){
+  const name = (nickname || "").trim();
+  if(name.length < 2) return { ok:false, error:"닉네임은 2자 이상 입력해 주세요." };
+  if(name.length > 12) return { ok:false, error:"닉네임은 12자까지 쓸 수 있어요." };
+  return { ok:true, name };
+}
+function signUp(nickname){
+  const v = validateNickname(nickname);
+  if(!v.ok) return v;
+  const accounts = getAccounts();
+  if(accounts.some(a => a.nickname === v.name)){
+    return { ok:false, error:"이 브라우저에 같은 닉네임이 이미 있어요. 로그인해 주세요." };
+  }
+  const account = {
+    id: "u-" + Date.now().toString(36) + Math.random().toString(36).slice(2, 7),
+    nickname: v.name,
+    joinedAt: new Date().toISOString().slice(0, 10),
+  };
+  accounts.push(account);
+  saveAccounts(accounts);
+  try{ localStorage.setItem("dahye_session", account.id); }catch(e){}
+  return { ok:true, account };
+}
+function signIn(nickname){
+  const v = validateNickname(nickname);
+  if(!v.ok) return v;
+  const account = getAccounts().find(a => a.nickname === v.name);
+  if(!account) return { ok:false, error:"이 브라우저에 그 닉네임으로 만든 계정이 없어요." };
+  try{ localStorage.setItem("dahye_session", account.id); }catch(e){}
+  return { ok:true, account };
+}
+function signOut(){
+  try{ localStorage.removeItem("dahye_session"); }catch(e){}
+}
+
 // ---------------- 찜하기 (로컬 저장) ----------------
 function getScraps(){
   try{ return JSON.parse(localStorage.getItem("dahye_scraps") || "[]"); }catch(e){ return []; }

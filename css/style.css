@@ -89,8 +89,17 @@ header.top{
   flex:none; border:none; background:var(--brand); color:var(--paper-raised);
   border-radius:999px; padding:7px 14px; font-size:.78rem; font-weight:600; cursor:pointer;
 }
-.scrap-link{ flex:none; font-size:.85rem; color:var(--muted); font-variant-numeric:tabular-nums; }
+.top-actions{ display:flex; align-items:center; gap:14px; flex:none; }
+.scrap-link{ font-size:.85rem; color:var(--muted); font-variant-numeric:tabular-nums; white-space:nowrap; }
 .scrap-link:hover{ color:var(--clay); }
+.auth-link{ font-size:.82rem; color:var(--muted); white-space:nowrap; }
+.auth-link:hover{ color:var(--brand); }
+.auth-btn{
+  font-size:.82rem; font-weight:600; color:var(--paper-raised); background:var(--brand);
+  border-radius:999px; padding:8px 16px; white-space:nowrap;
+}
+.auth-user{ font-size:.82rem; font-weight:600; color:var(--brand); white-space:nowrap; }
+.auth-user:hover{ text-decoration:underline; }
 
 @media (max-width:900px){
   .top-row{ flex-wrap:wrap; gap:12px 18px; padding:12px 16px; }
@@ -322,6 +331,58 @@ main{ display:block; }
 }
 .top-pick-row{ display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-top:20px; }
 @media (max-width:760px){ .top-pick-row{ grid-template-columns:1fr; } }
+
+/* ---- 로그인 · 회원가입 ---- */
+.auth-page{ max-width:var(--page-max); margin:0 auto; padding:48px 20px 80px; display:flex; justify-content:center; }
+.auth-card{
+  width:100%; max-width:420px; background:var(--paper-raised); border:1px solid var(--line);
+  border-radius:20px; padding:34px 28px 28px; box-shadow:var(--shadow);
+}
+.auth-lockup img{ width:118px; height:auto; margin:0 auto; }
+.auth-tabs{
+  display:flex; gap:4px; margin-top:26px; padding:4px;
+  background:var(--paper); border:1px solid var(--line); border-radius:999px;
+}
+.auth-tabs button{
+  flex:1; border:none; background:none; cursor:pointer; color:var(--muted);
+  font-size:.86rem; padding:9px 0; border-radius:999px;
+}
+.auth-tabs button[aria-pressed="true"]{ background:var(--brand); color:var(--paper-raised); font-weight:700; }
+.auth-form{ display:flex; flex-direction:column; margin-top:22px; }
+.auth-label{ font-size:.76rem; color:var(--muted); margin-bottom:8px; }
+.auth-form input{
+  font-family:inherit; font-size:.95rem; color:var(--ink);
+  background:var(--paper); border:1px solid var(--line); border-radius:12px; padding:13px 16px;
+}
+.auth-form input:focus-visible{ outline:2px solid var(--brand); outline-offset:2px; }
+.auth-msg{ font-size:.78rem; margin:8px 0 0; min-height:1.2em; color:var(--muted); }
+.auth-msg.is-error{ color:var(--clay); }
+.auth-submit{ margin-top:14px; }
+.auth-note{
+  font-size:.74rem; color:var(--muted); line-height:1.65; margin:20px 0 0;
+  padding-top:16px; border-top:1px solid var(--line);
+}
+.auth-note strong{ color:var(--ink); font-weight:600; }
+
+/* ---- 내 정보 ---- */
+.profile-card{
+  display:flex; align-items:center; gap:16px; flex-wrap:wrap;
+  background:var(--brand); color:var(--paper-raised); border-radius:20px; padding:24px 22px;
+}
+.profile-avatar{
+  width:56px; height:56px; border-radius:50%; flex:none;
+  display:flex; align-items:center; justify-content:center;
+  background:rgba(250,247,238,.18); font-family:'Noto Serif KR',serif; font-size:1.5rem;
+}
+.profile-body{ flex:1; min-width:0; }
+.profile-body h1{ color:var(--paper-raised); font-size:1.35rem; }
+.profile-meta{ font-size:.78rem; color:color-mix(in srgb, var(--paper-raised) 78%, transparent); margin:6px 0 0; }
+.profile-logout{ flex:none; }
+.empty-card{
+  border:1px dashed var(--line); border-radius:16px; padding:28px 22px; text-align:center;
+  background:var(--paper-raised);
+}
+.empty-card p{ color:var(--muted); font-size:.88rem; margin:0 0 16px; }
 
 /* ---- product page ---- */
 .wrap-product{ max-width:var(--page-max); margin:0 auto; padding:20px 20px 60px; }

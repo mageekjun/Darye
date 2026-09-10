@@ -9,6 +9,7 @@
 
   const active = document.body.getAttribute("data-page") || "";
   const query = new URLSearchParams(location.search).get("q") || "";
+  const user = currentUser();
 
   const header = document.createElement("header");
   header.className = "top";
@@ -25,7 +26,13 @@
         <input type="search" name="q" id="global-search" placeholder="차 이름·효능으로 찾기" value="${query.replace(/"/g,"&quot;")}" aria-label="차 검색">
         <button type="submit" aria-label="검색">검색</button>
       </form>
-      <a class="scrap-link" href="shop.html?scrapped=1" aria-label="찜한 차 보기">🔖 <span id="scrap-count">0</span></a>
+      <div class="top-actions">
+        <a class="scrap-link" href="shop.html?scrapped=1" aria-label="찜한 차 보기">🔖 <span id="scrap-count">0</span></a>
+        ${user
+          ? `<a class="auth-user" href="mypage.html">${user.nickname}님</a>`
+          : `<a class="auth-link" href="login.html">로그인</a>
+             <a class="auth-btn" href="login.html?mode=signup">회원가입</a>`}
+      </div>
     </div>
   `;
   document.body.insertBefore(header, document.body.firstChild);
