@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>다례(茶禮) — 상품 상세</title>
+<title>샵 — 다례(茶禮)</title>
+<meta name="description" content="전통차부터 해외차까지, 효능과 가격을 한 곳에서 비교하고 고르세요.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@500;600;700&family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -12,19 +13,21 @@
 <body data-page="shop">
 
 <main>
-  <div class="wrap-product">
-    <nav class="crumb" id="crumb"></nav>
-    <div class="product-main" id="product-main"></div>
-    <div class="spec-section" id="spec-section"></div>
-    <div class="related-section" id="related-section"></div>
+  <div class="page">
+    <div class="page-head">
+      <p class="eyebrow">Shop</p>
+      <h1 id="shop-title">차 둘러보기</h1>
+      <p id="shop-desc">전통차부터 해외차까지 14종. 취향 진단을 마치면 일치율이 함께 표시됩니다.</p>
+    </div>
+
+    <nav class="subnav" id="cat-tabs" aria-label="카테고리"></nav>
+    <div class="shop-grid" id="shop-grid"></div>
   </div>
 </main>
-
-<div class="sticky-buy-bar" id="sticky-buy-bar" hidden></div>
 
 <script src="js/data.js"></script>
 <script src="js/common.js"></script>
 <script src="js/layout.js"></script>
-<script src="js/product.js"></script>
+<script src="js/shop.js"></script>
 </body>
 </html>

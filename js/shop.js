@@ -1,100 +1,72 @@
-// 홈 화면과 상품 상세 페이지가 함께 쓰는 공통 로직 (카테고리 스타일, 매칭 스코어링, 카드 렌더링)
+(function(){
 
-const CATEGORY_STYLE = {
-  "녹차":     { icon:"🍵", accent:"#2e5339", light:"#e4ece3" },
-  "발효차":   { icon:"🫖", accent:"#6b4a2f", light:"#ecdfd0" },
-  "우롱차":   { icon:"🍂", accent:"#8a6a2f", light:"#f0e6cf" },
-  "홍차":     { icon:"☕", accent:"#b1502e", light:"#f3e2d8" },
-  "화차":     { icon:"🌸", accent:"#a15a7a", light:"#f2e0ea" },
-  "과일청차": { icon:"🍊", accent:"#c07a1e", light:"#f7e6cc" },
-  "허브차":   { icon:"🌿", accent:"#3f7a52", light:"#e1efe4" },
-};
+  const params = new URLSearchParams(location.search);
+  const query = (params.get("q") || "").trim();
+  const onlyScrapped = params.get("scrapped") === "1";
+  const profile = loadLocalProfile();
 
-const TASTE_LABEL = Object.fromEntries(TASTE_OPTS.map(o=>[o.id,o.label]));
-const PURPOSE_LABEL = Object.fromEntries(PURPOSE_OPTS.map(o=>[o.id,o.label]));
-const CAFFEINE_LABEL = { need:"카페인 있음", free:"무카페인", any:"약함/상관없음" };
+  let activeCat = params.get("cat") && CATEGORIES.includes(params.get("cat")) ? params.get("cat") : "all";
 
-const $ = (sel, root) => (root||document).querySelector(sel);
-const $$ = (sel, root) => Array.from((root||document).querySelectorAll(sel));
+  // 검색: 이름·원산지·카테고리·효능·맛 특징까지 훑는다
+  function matchesQuery(tea){
+    if(!query) return true;
+    const haystack = [
+      tea.name, tea.origin, tea.category, tea.effect, tea.story,
+      ...tea.taste.map(t => TASTE_LABEL[t]),
+      CAFFEINE_LABEL[tea.caffeine],
+    ].join(" ").toLowerCase();
+    return haystack.includes(query.toLowerCase());
+  }
 
-function toast(msg){
-  const t = $("#toast");
-  if(!t) return;
-  t.textContent = msg;
-  t.classList.add("show");
-  clearTimeout(t._timer);
-  t._timer = setTimeout(()=>t.classList.remove("show"), 2200);
-}
+  function visibleTeas(){
+    return TEAS.filter(t =>
+      matchesQuery(t) &&
+      (activeCat === "all" || t.category === activeCat) &&
+      (!onlyScrapped || isScrapped(t.id))
+    );
+  }
 
-// 위키미디어 커먼즈(CC 라이선스) 파일명을 실제 이미지 URL로 변환
-function commonsUrl(filename, width){
-  if(!filename) return null;
-  return `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(filename)}?width=${width || 600}`;
-}
+  function renderHead(){
+    if(onlyScrapped){
+      $("#shop-title").textContent = "찜한 차";
+      $("#shop-desc").textContent = "이 브라우저에 저장된 찜 목록입니다.";
+    } else if(query){
+      $("#shop-title").textContent = `'${query}' 검색 결과`;
+      $("#shop-desc").textContent = "이름·원산지·효능·맛 특징에서 찾았습니다.";
+    }
+  }
 
-function formatWon(price){
-  return price.toLocaleString("ko-KR") + "원";
-}
+  function renderTabs(){
+    const tabs = $("#cat-tabs");
+    const cats = ["all", ...CATEGORIES];
+    tabs.innerHTML = cats.map(c => `
+      <button type="button" data-cat="${c}" aria-pressed="${c === activeCat ? "true" : "false"}">${c === "all" ? "전체" : c}</button>
+    `).join("");
+  }
 
-// 목록 카드에 쓰는 기준가 — 가장 싼 용량의 가격
-function basePrice(tea){
-  return Math.min(...tea.options.map(o => o.price));
-}
+  function renderGrid(){
+    const grid = $("#shop-grid");
+    grid.innerHTML = "";
+    const list = visibleTeas();
+    if(!list.length){
+      grid.innerHTML = onlyScrapped
+        ? `<p class="empty-note">아직 찜한 차가 없어요. 마음에 드는 차의 상세 페이지에서 찜해보세요.</p>`
+        : `<p class="empty-note">조건에 맞는 차가 없어요. 다른 카테고리나 검색어로 찾아보세요.</p>`;
+      return;
+    }
+    list.forEach(t => grid.appendChild(teaCardEl(t, profile)));
+  }
 
-function applyCategoryStyle(el, category){
-  const s = CATEGORY_STYLE[category] || { icon:"🍵", accent:"#2e5339", light:"#e4ece3" };
-  el.style.setProperty("--accent", s.accent);
-  el.style.setProperty("--accent-light", s.light);
-  return s;
-}
+  $("#cat-tabs").addEventListener("click", (e)=>{
+    const btn = e.target.closest("[data-cat]");
+    if(!btn) return;
+    activeCat = btn.getAttribute("data-cat");
+    renderTabs();
+    renderGrid();
+  });
 
-function loadLocalProfile(){
-  try{
-    const raw = localStorage.getItem("dahye_profile");
-    return raw ? JSON.parse(raw) : null;
-  }catch(e){ return null; }
-}
-function saveLocalProfile(p){
-  try{ localStorage.setItem("dahye_profile", JSON.stringify(p)); }catch(e){}
-}
+  renderHead();
+  renderTabs();
+  renderGrid();
 
-function scoreTea(tea, profile){
-  if(!profile) return 0;
-  let score = 0;
-  tea.taste.forEach(t=>{ if(profile.taste.includes(t)) score += 3; });
-  if(profile.caffeine === "need" && tea.caffeine === "need") score += 2;
-  if(profile.caffeine === "free" && tea.caffeine === "free") score += 2;
-  if(profile.caffeine === "any") score += 1;
-  if(tea.caffeine === "any") score += 1;
-  tea.purpose.forEach(p=>{ if(profile.purpose.includes(p)) score += 2; });
-  return score;
-}
-function matchPercent(tea, profile){
-  const maxPossible = 3*2 + 2 + 2*2; // rough ceiling for display
-  const s = scoreTea(tea, profile);
-  return Math.min(97, Math.round((s / maxPossible) * 100));
-}
-
-// 샵 그리드 / 큐레이션 추천 / 관련 상품 목록이 공유하는 카드. 클릭하면 상품 상세 페이지로 이동한다.
-function teaCardEl(tea, profile){
-  const el = document.createElement("a");
-  el.className = "tea-card";
-  el.href = `product.html?id=${tea.id}`;
-  const style = applyCategoryStyle(el, tea.category);
-  const badge = profile ? `<span class="match-badge">${matchPercent(tea, profile)}% 일치</span>` : "";
-  const thumbFile = tea.images && tea.images[0];
-  const photo = thumbFile ? `<img src="${commonsUrl(thumbFile, 480)}" alt="" loading="lazy" onerror="this.remove()">` : "";
-  el.innerHTML = `
-    <div class="tea-thumb" aria-hidden="true"><span class="thumb-emoji">${style.icon}</span>${photo}${badge}</div>
-    <div class="tea-body">
-      <div class="name">${tea.name}</div>
-      <div class="origin">${tea.origin}</div>
-      <div class="tag-row">
-        <span class="tag">${tea.category}</span>
-        <span class="tag">${CAFFEINE_LABEL[tea.caffeine]}</span>
-      </div>
-      <div class="tea-price">${formatWon(basePrice(tea))} <span class="price-from">부터</span></div>
-    </div>
-  `;
-  return el;
-}
+})();

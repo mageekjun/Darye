@@ -15,22 +15,9 @@
 
   document.title = `${tea.name} — 다례(茶禮)`;
 
-  // ---------------- SCRAP (찜하기, 로컬 저장만) ----------------
-  function getScraps(){
-    try{ return JSON.parse(localStorage.getItem("dahye_scraps") || "[]"); }catch(e){ return []; }
-  }
-  function isScrapped(id){ return getScraps().includes(id); }
-  function toggleScrap(id){
-    let list = getScraps();
-    if(list.includes(id)) list = list.filter(x => x !== id);
-    else list.push(id);
-    try{ localStorage.setItem("dahye_scraps", JSON.stringify(list)); }catch(e){}
-    return list.includes(id);
-  }
-
   // ---------------- GALLERY ----------------
   let activeImageIdx = 0;
-  const style = CATEGORY_STYLE[tea.category] || { icon:"🍵", accent:"#2e5339", light:"#e4ece3" };
+  const style = categoryStyle(tea.category);
   const images = tea.images || [];
 
   function renderGallery(){
@@ -152,6 +139,8 @@
         b.setAttribute("aria-pressed", scrapped ? "true" : "false");
         b.textContent = scrapped ? "🔖 찜함" : "🔖 찜하기";
       });
+      const count = $("#scrap-count");
+      if(count) count.textContent = getScraps().length;
       toast(scrapped ? "찜한 차에 담았어요" : "찜한 차에서 뺐어요");
     }
   });

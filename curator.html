@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>취향 큐레이터 — 다례(茶禮)</title>
+<meta name="description" content="맛·카페인·목적 3가지만 알려주시면 14종의 차 중 취향에 맞는 차를 골라드립니다.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@500;600;700&family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body data-page="curator">
+
+<main>
+  <div class="page">
+
+    <!-- 진단 화면 -->
+    <section id="screen-quiz" hidden>
+      <div class="page-head">
+        <p class="eyebrow">Tea Curator</p>
+        <h1>당신의 차 취향은?</h1>
+        <p>약 30초 · 3가지만 알려주시면 14종의 차를 취향 순으로 정렬해 드립니다.</p>
+      </div>
+
+      <div class="q-card">
+        <div class="q-step">
+          <div class="step-label">1. 끌리는 맛 (최대 2개)</div>
+          <div class="chip-grid" id="taste-chips" role="group" aria-label="선호하는 맛"></div>
+        </div>
+        <div class="q-step">
+          <div class="step-label">2. 카페인</div>
+          <div class="chip-grid" id="caffeine-chips" role="group" aria-label="카페인 선호"></div>
+        </div>
+        <div class="q-step">
+          <div class="step-label">3. 지금 마시고 싶은 이유</div>
+          <div class="chip-grid" id="purpose-chips" role="group" aria-label="목적"></div>
+        </div>
+        <div class="q-foot">
+          <a class="btn ghost" href="shop.html">건너뛰고 전체 둘러보기</a>
+          <button class="btn primary" id="btn-submit" disabled>내 큐레이션 보기</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 결과 화면 -->
+    <section id="screen-result" hidden>
+      <div class="result-head">
+        <div>
+          <h2>당신을 위한 큐레이션</h2>
+          <div class="rh-sub" id="result-summary"></div>
+        </div>
+        <button type="button" class="retake" id="btn-retake">취향 다시 설정</button>
+      </div>
+
+      <div class="section">
+        <div class="section-head">
+          <div>
+            <h2>가장 잘 맞는 차 3종</h2>
+            <p class="section-sub">맛·카페인·목적 매칭 점수가 가장 높은 차예요</p>
+          </div>
+        </div>
+        <div class="top-pick-row" id="top-picks"></div>
+      </div>
+
+      <div class="section">
+        <div class="section-head">
+          <div>
+            <h2>나머지 추천 순위</h2>
+            <p class="section-sub">일치율 순으로 정렬했습니다</p>
+          </div>
+          <a class="more-link" href="shop.html">샵에서 전체 보기 →</a>
+        </div>
+        <div class="shop-grid" id="rest-grid"></div>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<script src="js/data.js"></script>
+<script src="js/common.js"></script>
+<script src="js/layout.js"></script>
+<script src="js/curator.js"></script>
+</body>
+</html>
