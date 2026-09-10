@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="다례">
+  <rect width="64" height="64" rx="14" fill="#2e5339"/>
+  <g transform="translate(1.2 7.9) scale(0.926)" fill="none" stroke="#faf7ee"
+     stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M31 28.5C27.5 19 32 9 41 7c4 6-2.5 17.5-10 21.5Z"/>
+    <path d="M41 7c-4.6 5.4-8 12.6-10 21.5"/>
+    <path d="M9.5 30H44c7 0 11.5-5 13-14.5"/>
+    <path d="M10 30c0 9.4 7.6 17 17 17s17-7.6 17-17"/>
+  </g>
+</svg>
