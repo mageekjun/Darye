@@ -61,13 +61,18 @@ header.top{
   max-width:var(--page-max); margin:0 auto;
   display:flex; align-items:center; gap:22px; padding:14px 20px;
 }
-.brand{ display:flex; align-items:center; gap:9px; flex:none; color:var(--brand); }
-.logo-mark{ width:1em; height:1em; display:block; }
-.brand .logo-mark{ width:30px; height:30px; flex:none; }
-.brand-type{ display:flex; flex-direction:column; line-height:1.05; }
-/* 워드마크는 나눔손글씨 붓. 한자는 이 서체에 없어 본명조로 고정한다. */
-.brand-ko{ font-family:'Nanum Brush Script', 'Noto Serif KR', serif; font-weight:400; font-size:1.5rem; color:var(--brand); letter-spacing:.06em; text-indent:.06em; }
-.brand-hanja{ font-family:'Noto Serif KR',serif; font-size:.6rem; color:var(--clay); letter-spacing:.34em; text-indent:.34em; }
+/* 로고는 이미지 에셋. 밝은/어두운 배경용 두 벌을 테마에 맞춰 바꾼다. */
+.brand{ display:flex; align-items:center; flex:none; }
+.brand .logo-img{ height:36px; width:auto; }
+/* 표시 여부는 .light-only/.dark-only 가 단독으로 정한다 (다른 규칙이 display를 덮지 않도록) */
+.light-only{ display:block; }
+.dark-only{ display:none; }
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]) .light-only{ display:none; }
+  :root:not([data-theme="light"]) .dark-only{ display:block; }
+}
+:root[data-theme="dark"] .light-only{ display:none; }
+:root[data-theme="dark"] .dark-only{ display:block; }
 .main-nav{ display:flex; gap:20px; flex:none; }
 .main-nav a{ font-size:.9rem; font-weight:500; color:var(--muted); padding:4px 0; border-bottom:2px solid transparent; }
 .main-nav a:hover{ color:var(--brand); }
@@ -413,12 +418,14 @@ main{ display:block; }
 
 /* ---- footer ---- */
 footer.foot{ border-top:1px solid var(--line); margin-top:20px; padding:40px 0 52px; }
-.foot-lockup{ text-align:center; color:var(--brand); padding-bottom:28px; }
-.foot-lockup .logo-mark{ width:52px; height:52px; margin:0 auto; }
-.foot-lockup .brand-ko{ font-size:2.3rem; letter-spacing:.1em; text-indent:.1em; margin-top:8px; }
-.foot-lockup .brand-hanja{ font-size:.76rem; letter-spacing:.5em; text-indent:.5em; margin-top:4px; }
-.foot-tagline{ font-size:.6rem; letter-spacing:.32em; text-indent:.32em; color:var(--muted); margin-top:14px; }
+.foot-lockup img{ width:160px; height:auto; margin:0 auto; }
+/* 브랜드 서명 한 줄에만 나눔손글씨 붓을 쓴다 */
+.foot-signature{
+  font-family:'Nanum Brush Script', 'Noto Serif KR', serif;
+  font-size:1.5rem; color:var(--brand); text-align:center; margin:20px 0 0;
+}
 .foot-row{
   display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px;
-  font-size:.74rem; color:var(--muted); border-top:1px solid var(--line); padding-top:18px;
+  font-size:.74rem; color:var(--muted); border-top:1px solid var(--line);
+  padding-top:18px; margin-top:32px;
 }

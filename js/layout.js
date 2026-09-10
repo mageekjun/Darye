@@ -7,18 +7,6 @@
     { id:"shop",      label:"샵", href:"shop.html" },
   ];
 
-  // 다례 심볼 (assets/logo.svg와 동일). currentColor를 쓰기 위해 인라인으로 넣는다.
-  const LOGO_MARK = `
-    <svg class="logo-mark" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
-      <g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M31 28.5C27.5 19 32 9 41 7c4 6-2.5 17.5-10 21.5Z"/>
-        <path d="M41 7c-4.6 5.4-8 12.6-10 21.5"/>
-        <path d="M9.5 30H44c7 0 11.5-5 13-14.5"/>
-        <path d="M10 30c0 9.4 7.6 17 17 17s17-7.6 17-17"/>
-      </g>
-    </svg>
-  `;
-
   const active = document.body.getAttribute("data-page") || "";
   const query = new URLSearchParams(location.search).get("q") || "";
 
@@ -26,12 +14,9 @@
   header.className = "top";
   header.innerHTML = `
     <div class="top-row">
-      <a class="brand" href="index.html" aria-label="다례 홈으로">
-        ${LOGO_MARK}
-        <span class="brand-type">
-          <span class="brand-ko">다례</span>
-          <span class="brand-hanja">茶禮</span>
-        </span>
+      <a class="brand" href="index.html">
+        <img class="logo-img light-only" src="assets/logo-h.png" width="488" height="240" alt="다례 茶禮">
+        <img class="logo-img dark-only" src="assets/logo-h-dark.png" width="488" height="240" alt="" aria-hidden="true">
       </a>
       <nav class="main-nav" aria-label="주요 메뉴">
         ${NAV.map(n => `<a href="${n.href}"${n.id === active ? ' class="is-active" aria-current="page"' : ""}>${n.label}</a>`).join("")}
@@ -50,13 +35,12 @@
   footer.innerHTML = `
     <div class="wrap">
       <div class="foot-lockup">
-        ${LOGO_MARK}
-        <div class="brand-ko">다례</div>
-        <div class="brand-hanja">茶禮</div>
-        <div class="foot-tagline">TEA FOR A BETTER LIFE</div>
+        <img class="light-only" src="assets/logo-lockup.png" width="420" height="689" alt="다례 茶禮 — Tea for a better life">
+        <img class="dark-only" src="assets/logo-lockup-dark.png" width="420" height="689" alt="" aria-hidden="true">
       </div>
+      <p class="foot-signature">차, 이제 검색하지 말고 물어보세요.</p>
       <div class="foot-row">
-        <span>차, 이제 검색하지 말고 물어보세요.</span>
+        <span>다례(茶禮)</span>
         <span>MVP 테스트 버전 · 실제 결제·배송은 연결되어 있지 않습니다</span>
       </div>
     </div>
