@@ -1,15 +1,28 @@
 // 모든 페이지가 함께 쓰는 공통 로직 (카테고리 스타일, 매칭 스코어링, 카드 렌더링)
 
 const CATEGORY_STYLE = {
-  "녹차":     { icon:"🍵", accent:"#2e5339", light:"#e4ece3" },
-  "발효차":   { icon:"🫖", accent:"#6b4a2f", light:"#ecdfd0" },
-  "우롱차":   { icon:"🍂", accent:"#8a6a2f", light:"#f0e6cf" },
-  "홍차":     { icon:"☕", accent:"#b1502e", light:"#f3e2d8" },
-  "화차":     { icon:"🌸", accent:"#a15a7a", light:"#f2e0ea" },
-  "과일청차": { icon:"🍊", accent:"#c07a1e", light:"#f7e6cc" },
-  "허브차":   { icon:"🌿", accent:"#3f7a52", light:"#e1efe4" },
+  "녹차":      { icon:"🍵", accent:"#2e5339", light:"#e4ece3" },
+  "말차":      { icon:"🍵", accent:"#4a7a3a", light:"#e6efdc" },
+  "발효차":    { icon:"🫖", accent:"#6b4a2f", light:"#ecdfd0" },
+  "우롱차":    { icon:"🍂", accent:"#8a6a2f", light:"#f0e6cf" },
+  "홍차":      { icon:"☕", accent:"#b1502e", light:"#f3e2d8" },
+  "화차":      { icon:"🌸", accent:"#a15a7a", light:"#f2e0ea" },
+  "과일청차":  { icon:"🍊", accent:"#c07a1e", light:"#f7e6cc" },
+  "허브차":    { icon:"🌿", accent:"#3f7a52", light:"#e1efe4" },
+  "약차":      { icon:"🌾", accent:"#7a6234", light:"#efe7d2" },
+  "다관":      { icon:"🫖", accent:"#4a5a63", light:"#e3e9ec" },
+  "찻잔":      { icon:"🍶", accent:"#5c6b74", light:"#e6ebee" },
+  "우림 도구": { icon:"🥄", accent:"#6b6558", light:"#e9e5da" },
+  "다기 세트": { icon:"🎎", accent:"#4a5a63", light:"#e3e9ec" },
 };
-const CATEGORIES = Object.keys(CATEGORY_STYLE);
+
+// 대분류에 실제로 들어 있는 소분류만 노출한다 (데이터가 늘어도 메뉴가 저절로 맞는다)
+function categoriesOf(groupId){
+  const list = groupId ? PRODUCTS.filter(p => p.group === groupId) : PRODUCTS;
+  return Array.from(new Set(list.map(p => p.category)));
+}
+function isTool(product){ return product.group === "tool"; }
+function productById(id){ return PRODUCTS.find(p => p.id === id) || null; }
 
 const TASTE_LABEL = Object.fromEntries(TASTE_OPTS.map(o=>[o.id,o.label]));
 const PURPOSE_LABEL = Object.fromEntries(PURPOSE_OPTS.map(o=>[o.id,o.label]));
@@ -222,25 +235,28 @@ function toggleScrap(id){
 }
 
 // ---------------- 카드 ----------------
-// 샵 그리드 / 큐레이션 추천 / 관련 상품 목록이 공유하는 상품 카드
-function teaCardEl(tea, profile){
+// 샵 그리드 / 큐레이션 추천 / 관련 상품 목록이 공유하는 상품 카드.
+// 도구는 맛·카페인 대신 재질을 보여주고 일치율 배지를 붙이지 않는다.
+function teaCardEl(product, profile){
   const el = document.createElement("a");
   el.className = "tea-card";
-  el.href = `product.html?id=${tea.id}`;
-  const style = applyCategoryStyle(el, tea.category);
-  const badge = profile ? `<span class="match-badge">${matchPercent(tea, profile)}% 일치</span>` : "";
-  const thumbFile = tea.images && tea.images[0];
+  el.href = `product.html?id=${product.id}`;
+  const style = applyCategoryStyle(el, product.category);
+  const badge = (profile && !isTool(product))
+    ? `<span class="match-badge">${matchPercent(product, profile)}% 일치</span>` : "";
+  const thumbFile = product.images && product.images[0];
   const photo = thumbFile ? `<img src="${commonsUrl(thumbFile, 480)}" alt="" loading="lazy" onerror="this.remove()">` : "";
+  const secondTag = isTool(product) ? product.material : CAFFEINE_LABEL[product.caffeine];
   el.innerHTML = `
     <div class="tea-thumb" aria-hidden="true"><span class="thumb-emoji">${style.icon}</span>${photo}${badge}</div>
     <div class="tea-body">
-      <div class="name">${tea.name}</div>
-      <div class="origin">${tea.origin}</div>
+      <div class="name">${product.name}</div>
+      <div class="origin">${product.origin}</div>
       <div class="tag-row">
-        <span class="tag">${tea.category}</span>
-        <span class="tag">${CAFFEINE_LABEL[tea.caffeine]}</span>
+        <span class="tag">${product.category}</span>
+        <span class="tag">${secondTag}</span>
       </div>
-      <div class="tea-price">${formatWon(basePrice(tea))} <span class="price-from">부터</span></div>
+      <div class="tea-price">${formatWon(basePrice(product))} <span class="price-from">부터</span></div>
     </div>
   `;
   return el;

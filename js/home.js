@@ -43,13 +43,19 @@
   // ---------------- SHORTCUTS ----------------
   function renderShortcuts(){
     const row = $("#shortcut-row");
+    // 대분류를 앞에 세우고, 자주 찾는 소분류를 뒤에 붙인다
+    const POPULAR = ["녹차", "홍차", "허브차", "약차", "다관"];
     const items = [
       { icon:"🎯", label:"취향 진단", href:"curator.html", accent:"#b1502e", light:"#f3e2d8" },
-      ...CATEGORIES.map(c => {
+      ...GROUPS.map(g => {
+        const s = categoryStyle(g.id === "tool" ? "다관" : "녹차");
+        return { icon:g.icon, label:g.label, href:`shop.html?group=${g.id}`, accent:s.accent, light:s.light };
+      }),
+      ...POPULAR.map(c => {
         const s = categoryStyle(c);
         return { icon:s.icon, label:c, href:`shop.html?cat=${encodeURIComponent(c)}`, accent:s.accent, light:s.light };
       }),
-      { icon:"🔖", label:"찜한 차", href:"shop.html?scrapped=1", accent:"#6b6558", light:"#e8e3d5" },
+      { icon:"🔖", label:"찜한 상품", href:"shop.html?scrapped=1", accent:"#6b6558", light:"#e8e3d5" },
     ];
     row.innerHTML = items.map(i => `
       <a class="shortcut" href="${i.href}" style="--accent:${i.accent}; --accent-light:${i.light};">
@@ -85,7 +91,12 @@
 
   function renderShopPreview(){
     const grid = $("#home-shop");
-    const list = profile ? rankedTeas(profile).slice(0,8) : TEAS.slice(0,8);
+    // 국내차·해외차·차 도구를 섞어 보여줘 대분류가 있다는 걸 첫 화면에서 알린다
+    const list = profile
+      ? [...rankedTeas(profile).slice(0,6), ...TOOLS.slice(0,2)]
+      : [...TEAS.filter(t=>t.group==="domestic").slice(0,3),
+         ...TEAS.filter(t=>t.group==="overseas").slice(0,3),
+         ...TOOLS.slice(0,2)];
     list.forEach(t => grid.appendChild(teaCardEl(t, profile)));
   }
 

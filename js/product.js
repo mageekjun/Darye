@@ -1,13 +1,13 @@
 (function(){
 
   const params = new URLSearchParams(location.search);
-  const tea = TEAS.find(t => t.id === params.get("id"));
+  const tea = productById(params.get("id"));
   const profile = loadLocalProfile();
 
   if(!tea){
     $("#product-main").innerHTML = `
       <div style="grid-column:1/-1; padding:40px 0; text-align:center; color:var(--muted);">
-        상품을 찾을 수 없습니다. <a href="index.html#shop" style="color:var(--brand); text-decoration:underline;">샵으로 돌아가기</a>
+        상품을 찾을 수 없습니다. <a href="shop.html" style="color:var(--brand); text-decoration:underline;">샵으로 돌아가기</a>
       </div>
     `;
     return;
@@ -54,10 +54,10 @@
         <div class="buy-brand">다례 · ${tea.category}</div>
         <h1 class="buy-title">${tea.name}</h1>
         <div class="buy-origin">${tea.origin}</div>
-        ${profile ? `<div class="buy-match"><span class="match-badge">${matchPercent(tea, profile)}% 일치</span></div>` : ""}
+        ${(profile && !isTool(tea)) ? `<div class="buy-match"><span class="match-badge">${matchPercent(tea, profile)}% 일치</span></div>` : ""}
         <div class="buy-effect">${tea.effect}</div>
         <div class="option-block">
-          <label class="option-label" for="opt-weight">용량</label>
+          <label class="option-label" for="opt-weight">${isTool(tea) ? "구성" : "용량"}</label>
           <select class="option-select" id="opt-weight">
             ${tea.options.map((o,i) => `<option value="${i}">${o.weight} · ${formatWon(o.price)}</option>`).join("")}
           </select>
@@ -75,23 +75,33 @@
     `;
     renderGallery();
 
+    const priceRow = `<tr><td>구성·가격</td><td>${tea.options.map(o => `${o.weight} ${formatWon(o.price)}`).join(" / ")}</td></tr>`;
+    const specRows = isTool(tea)
+      ? `<tr><td>재질</td><td>${tea.material}</td></tr>
+         <tr><td>규격</td><td>${tea.capacity}</td></tr>
+         <tr><td>쓰는 법</td><td>${tea.usage}</td></tr>
+         ${priceRow}`
+      : `<tr><td>효능</td><td>${tea.effect}</td></tr>
+         <tr><td>맛 특징</td><td>${tea.taste.map(t=>TASTE_LABEL[t]).join(", ")}</td></tr>
+         <tr><td>바디감</td><td>${BODY_LABEL[tea.body]}</td></tr>
+         <tr><td>향</td><td>${AROMA_LABEL[tea.aroma]}</td></tr>
+         <tr><td>카페인</td><td>${CAFFEINE_LABEL[tea.caffeine]}</td></tr>
+         <tr><td>어울리는 때</td><td>${tea.time.map(t=>TIME_LABEL[t]).join(", ")}</td></tr>
+         <tr><td>우리는 법</td><td>${tea.brew}</td></tr>
+         ${priceRow}`;
     $("#spec-section").innerHTML = `
       <h2>상세 정보</h2>
-      <table class="kv-table">
-        <tr><td>효능</td><td>${tea.effect}</td></tr>
-        <tr><td>맛 특징</td><td>${tea.taste.map(t=>TASTE_LABEL[t]).join(", ")}</td></tr>
-        <tr><td>카페인</td><td>${CAFFEINE_LABEL[tea.caffeine]}</td></tr>
-        <tr><td>우리는 법</td><td>${tea.brew}</td></tr>
-        <tr><td>용량·가격</td><td>${tea.options.map(o => `${o.weight} ${formatWon(o.price)}`).join(" / ")}</td></tr>
-      </table>
+      <table class="kv-table">${specRows}</table>
       <div class="story">${tea.story}</div>
     `;
 
-    const related = TEAS.filter(t => t.id !== tea.id && t.category === tea.category).slice(0,3);
-    const relatedList = related.length ? related : TEAS.filter(t => t.id !== tea.id).slice(0,3);
+    const sameCat = PRODUCTS.filter(p => p.id !== tea.id && p.category === tea.category);
+    const sameGroup = PRODUCTS.filter(p => p.id !== tea.id && p.group === tea.group);
+    const relatedList = (sameCat.length ? sameCat : sameGroup).slice(0,4);
     const relatedSection = $("#related-section");
     if(relatedList.length){
-      relatedSection.innerHTML = `<h2>함께 보면 좋은 차</h2><div class="shop-grid" id="related-grid"></div>`;
+      const heading = isTool(tea) ? "함께 보면 좋은 도구" : "함께 보면 좋은 차";
+      relatedSection.innerHTML = `<h2>${heading}</h2><div class="shop-grid" id="related-grid"></div>`;
       const grid = $("#related-grid");
       relatedList.forEach(t => grid.appendChild(teaCardEl(t, profile)));
     }
@@ -141,7 +151,7 @@
       });
       const count = $("#scrap-count");
       if(count) count.textContent = getScraps().length;
-      toast(scrapped ? "찜한 차에 담았어요" : "찜한 차에서 뺐어요");
+      toast(scrapped ? "찜 목록에 담았어요" : "찜 목록에서 뺐어요");
     }
   });
 
