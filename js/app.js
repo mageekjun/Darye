@@ -1,71 +1,10 @@
 (function(){
 
-  const CATEGORY_STYLE = {
-    "녹차":     { icon:"🍵", accent:"#2e5339", light:"#e4ece3" },
-    "발효차":   { icon:"🫖", accent:"#6b4a2f", light:"#ecdfd0" },
-    "우롱차":   { icon:"🍂", accent:"#8a6a2f", light:"#f0e6cf" },
-    "홍차":     { icon:"☕", accent:"#b1502e", light:"#f3e2d8" },
-    "화차":     { icon:"🌸", accent:"#a15a7a", light:"#f2e0ea" },
-    "과일청차": { icon:"🍊", accent:"#c07a1e", light:"#f7e6cc" },
-    "허브차":   { icon:"🌿", accent:"#3f7a52", light:"#e1efe4" },
-  };
-
-  const TASTE_LABEL = Object.fromEntries(TASTE_OPTS.map(o=>[o.id,o.label]));
-  const PURPOSE_LABEL = Object.fromEntries(PURPOSE_OPTS.map(o=>[o.id,o.label]));
-  const CAFFEINE_LABEL = { need:"카페인 있음", free:"무카페인", any:"약함/상관없음" };
-
-  const $ = (sel, root) => (root||document).querySelector(sel);
-  const $$ = (sel, root) => Array.from((root||document).querySelectorAll(sel));
-
-  function toast(msg){
-    const t = $("#toast");
-    t.textContent = msg;
-    t.classList.add("show");
-    clearTimeout(t._timer);
-    t._timer = setTimeout(()=>t.classList.remove("show"), 2200);
-  }
-
-  function applyCategoryStyle(el, category){
-    const s = CATEGORY_STYLE[category] || { icon:"🍵", accent:"#2e5339", light:"#e4ece3" };
-    el.style.setProperty("--accent", s.accent);
-    el.style.setProperty("--accent-light", s.light);
-    return s;
-  }
-
   // ---------------- STATE ----------------
   let profile = null;          // {taste:[], caffeine:'', purpose:[]}
   let selTaste = [], selCaffeine = null, selPurpose = [];
   let activeFilter = "all";
   let feedProof = {};          // { [postId]: {liked:false, scrapped:false} } — 현재 방문자의 로컬 반응만 반영, 공유 카운트 없음
-
-  // ---------------- LOCAL STORAGE ----------------
-  function loadLocalProfile(){
-    try{
-      const raw = localStorage.getItem("dahye_profile");
-      return raw ? JSON.parse(raw) : null;
-    }catch(e){ return null; }
-  }
-  function saveLocalProfile(p){
-    try{ localStorage.setItem("dahye_profile", JSON.stringify(p)); }catch(e){}
-  }
-
-  // ---------------- MATCHING (reused 그대로) ----------------
-  function scoreTea(tea){
-    if(!profile) return 0;
-    let score = 0;
-    tea.taste.forEach(t=>{ if(profile.taste.includes(t)) score += 3; });
-    if(profile.caffeine === "need" && tea.caffeine === "need") score += 2;
-    if(profile.caffeine === "free" && tea.caffeine === "free") score += 2;
-    if(profile.caffeine === "any") score += 1;
-    if(tea.caffeine === "any") score += 1;
-    tea.purpose.forEach(p=>{ if(profile.purpose.includes(p)) score += 2; });
-    return score;
-  }
-  function matchPercent(tea){
-    const maxPossible = 3*2 + 2 + 2*2; // rough ceiling for display
-    const s = scoreTea(tea);
-    return Math.min(97, Math.round((s / maxPossible) * 100));
-  }
 
   // ---------------- FEED ----------------
   function feedCardEl(post){
@@ -116,29 +55,6 @@
   }
 
   // ---------------- CURATOR CTA / RESULT ----------------
-  function teaCardEl(tea, showMatch){
-    const el = document.createElement("button");
-    el.className = "tea-card";
-    el.type = "button";
-    el.addEventListener("click", ()=> openDetail(tea.id));
-    const style = applyCategoryStyle(el, tea.category);
-    const badge = showMatch ? `<span class="match-badge">${matchPercent(tea)}% 일치</span>` : "";
-    const photo = tea.image ? `<img src="${tea.image}" alt="" loading="lazy" onerror="this.remove()">` : "";
-    el.innerHTML = `
-      <div class="tea-thumb" aria-hidden="true"><span class="thumb-emoji">${style.icon}</span>${photo}${badge}</div>
-      <div class="tea-body">
-        <div class="name">${tea.name}</div>
-        <div class="origin">${tea.origin}</div>
-        <div class="tag-row">
-          <span class="tag">${tea.category}</span>
-          <span class="tag">${CAFFEINE_LABEL[tea.caffeine]}</span>
-        </div>
-        <div class="tea-price">${tea.price}</div>
-      </div>
-    `;
-    return el;
-  }
-
   function renderCuratorCard(){
     const card = $("#curator-card");
     if(!profile){
@@ -152,7 +68,7 @@
       return;
     }
     card.className = "curator-card curator-result";
-    const ranked = TEAS.slice().sort((a,b)=> scoreTea(b) - scoreTea(a)).slice(0,3);
+    const ranked = TEAS.slice().sort((a,b)=> scoreTea(b, profile) - scoreTea(a, profile)).slice(0,3);
     const summary = `${profile.taste.map(t=>TASTE_LABEL[t]).join("·")} / ${CAFFEINE_LABEL[profile.caffeine]} / ${profile.purpose.map(p=>PURPOSE_LABEL[p]).join("·")}`;
     card.innerHTML = `
       <div class="cr-head">
@@ -165,7 +81,7 @@
       <div class="pick-row" id="pick-row"></div>
     `;
     const row = $("#pick-row", card);
-    ranked.forEach(t => row.appendChild(teaCardEl(t, true)));
+    ranked.forEach(t => row.appendChild(teaCardEl(t, profile)));
     $("#btn-retake", card).addEventListener("click", ()=>{
       selTaste = []; selCaffeine = null; selPurpose = [];
       renderOnboarding();
@@ -244,30 +160,8 @@
     const grid = $("#shop-grid");
     grid.innerHTML = "";
     const list = activeFilter === "all" ? TEAS : TEAS.filter(t=>t.category===activeFilter);
-    list.forEach(t => grid.appendChild(teaCardEl(t, !!profile)));
+    list.forEach(t => grid.appendChild(teaCardEl(t, profile)));
     $("#shop-count").textContent = `${list.length}종`;
-  }
-
-  // ---------------- DETAIL SHEET ----------------
-  function openDetail(id){
-    const tea = TEAS.find(t=>t.id===id);
-    if(!tea) return;
-    const iconEl = $("#detail-icon");
-    const style = applyCategoryStyle(iconEl, tea.category);
-    iconEl.innerHTML = tea.image
-      ? `<span class="thumb-emoji">${style.icon}</span><img src="${tea.image}" alt="" loading="lazy" onerror="this.remove()">`
-      : style.icon;
-    $("#detail-name").textContent = tea.name;
-    $("#detail-origin").textContent = tea.origin + " · " + tea.category;
-    $("#detail-match").textContent = profile ? `${matchPercent(tea)}% 일치` : "취향 미설정";
-    $("#detail-match").style.display = profile ? "inline-block" : "none";
-    $("#detail-effect").textContent = tea.effect;
-    $("#detail-taste").textContent = tea.taste.map(t=>TASTE_LABEL[t]).join(", ");
-    $("#detail-caffeine").textContent = CAFFEINE_LABEL[tea.caffeine];
-    $("#detail-brew").textContent = tea.brew;
-    $("#detail-price").textContent = tea.price;
-    $("#detail-story").textContent = tea.story;
-    openOverlay("overlay-detail");
   }
 
   // ---------------- OVERLAY HELPERS ----------------
@@ -291,7 +185,6 @@
   $("#btn-submit-onb").addEventListener("click", submitOnboarding);
   $("#btn-skip").addEventListener("click", skipOnboarding);
   $("#btn-feed-more").addEventListener("click", ()=> toast("커뮤니티 페이지는 다음 업데이트에서 제공됩니다"));
-  $("#btn-buy").addEventListener("click", ()=> toast("MVP 테스트 단계입니다 — 구매 연동은 다음 버전에서 제공돼요"));
 
   // ---------------- INIT ----------------
   function init(){

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>다례(茶禮) — 상품 상세</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@500;600;700&family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="top">
+  <div class="row wrap">
+    <a class="brand" href="index.html" aria-label="다례 홈으로">
+      <span class="mark">다례</span>
+      <span class="hanja">茶禮</span>
+    </a>
+    <nav class="main-nav" aria-label="주요 메뉴">
+      <a href="index.html#feed">커뮤니티</a>
+      <a href="index.html#curator">취향 큐레이터</a>
+      <a href="index.html#shop">샵</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="wrap-product">
+    <nav class="crumb" id="crumb"></nav>
+    <div class="product-main" id="product-main"></div>
+    <div class="spec-section" id="spec-section"></div>
+    <div class="related-section" id="related-section"></div>
+  </div>
+</main>
+
+<div class="sticky-buy-bar" id="sticky-buy-bar" hidden></div>
+
+<footer class="foot">
+  <div class="wrap foot-row">
+    <span>다례(茶禮) · MVP 테스트 버전</span>
+    <span>실제 결제·배송은 연결되어 있지 않습니다</span>
+  </div>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script src="js/data.js"></script>
+<script src="js/shop.js"></script>
+<script src="js/product.js"></script>
+</body>
+</html>
