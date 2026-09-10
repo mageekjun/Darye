@@ -15,6 +15,14 @@ const TASTE_LABEL = Object.fromEntries(TASTE_OPTS.map(o=>[o.id,o.label]));
 const PURPOSE_LABEL = Object.fromEntries(PURPOSE_OPTS.map(o=>[o.id,o.label]));
 const CAFFEINE_LABEL = { need:"카페인 있음", free:"무카페인", any:"약함/상관없음" };
 
+// 차 자체의 특성을 설명할 때 쓰는 표기 (질문 선택지 문구와 다르다)
+const BODY_LABEL   = { light:"가벼운 바디", medium:"중간 바디", full:"묵직한 바디" };
+const AROMA_LABEL  = { subtle:"은은한 향", clear:"뚜렷한 향", bold:"강한 향" };
+const TIME_LABEL   = { morning:"아침", afternoon:"낮·오후", evening:"저녁" };
+const EFFORT_LABEL = { easy:"간편하게", standard:"찻잎 우리기", ritual:"천천히 우리기" };
+const LEVEL_LABEL  = { beginner:"입문용", intermediate:"중급", advanced:"숙련자용" };
+const LEVEL_RANK   = { beginner:1, intermediate:2, advanced:3 };
+
 const $ = (sel, root) => (root||document).querySelector(sel);
 const $$ = (sel, root) => Array.from((root||document).querySelectorAll(sel));
 
@@ -64,24 +72,87 @@ function saveLocalProfile(p){
   try{ localStorage.setItem("dahye_profile", JSON.stringify(p)); }catch(e){}
 }
 function profileSummary(profile){
-  return `${profile.taste.map(t=>TASTE_LABEL[t]).join("·")} / ${CAFFEINE_LABEL[profile.caffeine]} / ${profile.purpose.map(p=>PURPOSE_LABEL[p]).join("·")}`;
+  const parts = [
+    profile.taste.map(t=>TASTE_LABEL[t]).join("·"),
+    profile.body && profile.body !== "any" ? BODY_LABEL[profile.body] : null,
+    profile.aroma && profile.aroma !== "any" ? AROMA_LABEL[profile.aroma] : null,
+    CAFFEINE_LABEL[profile.caffeine],
+    profile.time && profile.time !== "any" ? TIME_LABEL[profile.time] : null,
+    profile.purpose.map(p=>PURPOSE_LABEL[p]).join("·"),
+    profile.effort && profile.effort !== "any" ? EFFORT_LABEL[profile.effort] : null,
+  ].filter(Boolean);
+  return parts.join(" · ");
+}
+
+// 항목별 배점. 예전에 저장된 3문항 프로필도 그대로 계산되도록 각 항목을 개별 확인한다.
+function scoreBreakdown(tea, profile){
+  const hits = [];
+  let score = 0, max = 0;
+
+  max += 6;
+  const tasteHits = tea.taste.filter(t => profile.taste.includes(t));
+  score += tasteHits.length * 3;
+  tasteHits.forEach(t => hits.push(TASTE_LABEL[t]));
+
+  if(profile.body){
+    max += 3;
+    if(profile.body === "any") score += 1;
+    else if(tea.body === profile.body){ score += 3; hits.push(BODY_LABEL[tea.body]); }
+  }
+  if(profile.aroma){
+    max += 2;
+    if(profile.aroma === "any") score += 1;
+    else if(tea.aroma === profile.aroma){ score += 2; hits.push(AROMA_LABEL[tea.aroma]); }
+  }
+
+  max += 2;
+  if(profile.caffeine === "any"){ score += 1; }
+  else if(profile.caffeine === tea.caffeine){
+    score += 2; hits.push(CAFFEINE_LABEL[tea.caffeine]);
+  }
+  if(tea.caffeine === "any") score += 1;
+
+  if(profile.time){
+    max += 2;
+    if(profile.time === "any") score += 1;
+    else if(tea.time.includes(profile.time)){ score += 2; hits.push(TIME_LABEL[profile.time] + "에 좋음"); }
+  }
+
+  max += 4;
+  const purposeHits = tea.purpose.filter(p => profile.purpose.includes(p));
+  score += purposeHits.length * 2;
+  purposeHits.forEach(p => hits.push(PURPOSE_LABEL[p]));
+
+  if(profile.effort){
+    max += 2;
+    if(profile.effort === "any") score += 1;
+    else if(tea.effort === profile.effort){ score += 2; hits.push(EFFORT_LABEL[tea.effort]); }
+  }
+
+  // 입문자에게 숙련자용 차를 밀지 않는다
+  if(profile.level){
+    max += 2;
+    const gap = LEVEL_RANK[tea.level] - LEVEL_RANK[profile.level];
+    if(gap <= 0){ score += 2; if(gap === 0) hits.push(LEVEL_LABEL[tea.level]); }
+    else if(gap >= 2) score -= 3;
+  }
+
+  return { score, max, hits };
 }
 
 function scoreTea(tea, profile){
   if(!profile) return 0;
-  let score = 0;
-  tea.taste.forEach(t=>{ if(profile.taste.includes(t)) score += 3; });
-  if(profile.caffeine === "need" && tea.caffeine === "need") score += 2;
-  if(profile.caffeine === "free" && tea.caffeine === "free") score += 2;
-  if(profile.caffeine === "any") score += 1;
-  if(tea.caffeine === "any") score += 1;
-  tea.purpose.forEach(p=>{ if(profile.purpose.includes(p)) score += 2; });
-  return score;
+  return scoreBreakdown(tea, profile).score;
 }
 function matchPercent(tea, profile){
-  const maxPossible = 3*2 + 2 + 2*2; // rough ceiling for display
-  const s = scoreTea(tea, profile);
-  return Math.min(97, Math.round((s / maxPossible) * 100));
+  if(!profile) return 0;
+  const { score, max } = scoreBreakdown(tea, profile);
+  return Math.max(0, Math.min(97, Math.round((score / max) * 100)));
+}
+// 추천 근거 — 결과 화면에서 "왜 이 차인지"를 보여준다
+function matchReasons(tea, profile, limit){
+  if(!profile) return [];
+  return scoreBreakdown(tea, profile).hits.slice(0, limit || 4);
 }
 function rankedTeas(profile){
   return TEAS.slice().sort((a,b)=> scoreTea(b, profile) - scoreTea(a, profile));

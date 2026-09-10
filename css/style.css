@@ -303,12 +303,30 @@ main{ display:block; }
 .empty-note{ padding:40px 0; text-align:center; color:var(--muted); font-size:.88rem; }
 
 /* ---- curator page ---- */
-.q-card{
-  background:var(--paper-raised); border:1px solid var(--line); border-radius:20px;
-  padding:28px 24px; box-shadow:var(--shadow); max-width:680px;
+.quiz-head{ max-width:680px; margin:0 auto 18px; }
+.quiz-progress{
+  height:4px; border-radius:999px; background:var(--line); margin-top:14px; overflow:hidden;
 }
-.q-step{ margin-top:26px; }
-.q-step:first-of-type{ margin-top:0; }
+.quiz-bar{ height:100%; width:0; background:var(--brand); border-radius:999px; transition:width .3s ease; }
+.quiz-count{ font-size:.74rem; color:var(--muted); margin:8px 0 0; font-variant-numeric:tabular-nums; }
+.quiz-card{
+  background:var(--paper-raised); border:1px solid var(--line); border-radius:20px;
+  padding:32px 26px 26px; box-shadow:var(--shadow); max-width:680px; margin:0 auto;
+}
+.quiz-q{ font-size:1.35rem; line-height:1.45; }
+.quiz-help{ font-size:.84rem; color:var(--muted); margin:12px 0 0; }
+.quiz-card .chip-grid{ margin-top:22px; }
+.quiz-nav{ display:flex; justify-content:space-between; align-items:center; gap:10px; margin-top:30px; }
+.quiz-nav .btn.primary{ margin-left:auto; }
+@media (prefers-reduced-motion: reduce){ .quiz-bar{ transition:none; } }
+
+/* 추천 근거 */
+.pick-item{ display:flex; flex-direction:column; gap:10px; }
+.reason-row{ display:flex; flex-wrap:wrap; gap:6px; }
+.reason-chip{
+  font-size:.7rem; color:var(--brand); background:var(--brand-light);
+  border-radius:999px; padding:4px 10px;
+}
 .step-label{ font-size:.76rem; color:var(--muted); letter-spacing:.03em; }
 .chip-grid{ display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
 .chip{
@@ -317,7 +335,6 @@ main{ display:block; }
 }
 .chip:hover{ border-color:var(--brand); }
 .chip[aria-pressed="true"]{ background:var(--brand); border-color:var(--brand); color:var(--paper-raised); }
-.q-foot{ display:flex; justify-content:space-between; align-items:center; margin-top:30px; gap:10px; flex-wrap:wrap; }
 
 .result-head{
   display:flex; align-items:flex-start; justify-content:space-between; gap:14px; flex-wrap:wrap;

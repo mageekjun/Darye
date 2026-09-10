@@ -21,12 +21,52 @@ const PURPOSE_OPTS = [
   { id: "gift", label: "선물·특별한 날" },
 ];
 
+// 바디감 — 입안에 남는 무게감
+const BODY_OPTS = [
+  { id: "light", label: "가볍고 산뜻하게" },
+  { id: "medium", label: "중간 정도" },
+  { id: "full", label: "진하고 묵직하게" },
+  { id: "any", label: "상관없어요" },
+];
+
+// 향의 세기
+const AROMA_OPTS = [
+  { id: "subtle", label: "은은하게" },
+  { id: "clear", label: "뚜렷하게" },
+  { id: "bold", label: "확실히 강하게" },
+  { id: "any", label: "상관없어요" },
+];
+
+// 주로 마시는 시간대
+const TIME_OPTS = [
+  { id: "morning", label: "아침" },
+  { id: "afternoon", label: "낮·오후" },
+  { id: "evening", label: "저녁·자기 전" },
+  { id: "any", label: "때를 가리지 않아요" },
+];
+
+// 우리는 데 들이는 정성
+const EFFORT_OPTS = [
+  { id: "easy", label: "간편하게 (티백·타 먹기)" },
+  { id: "standard", label: "찻잎 우려서" },
+  { id: "ritual", label: "다구 갖춰 천천히" },
+  { id: "any", label: "상관없어요" },
+];
+
+// 차 경험 — 입문자에게 강한 차를 밀지 않기 위한 기준
+const LEVEL_OPTS = [
+  { id: "beginner", label: "차는 거의 처음이에요" },
+  { id: "intermediate", label: "몇 가지 마셔봤어요" },
+  { id: "advanced", label: "꽤 익숙해요" },
+];
+
 // images: 위키미디어 커먼즈(CC 라이선스) 파일명. commonsUrl()로 실제 URL을 만든다.
 // options: 용량별 판매 단가. 첫 항목이 기본 선택이자 목록의 "~원부터" 기준가.
 const TEAS = [
   { id: "hadong-ujeon", name: "하동 우전 녹차", origin: "국내 · 경남 하동", category: "녹차",
     images: ["Dried_jakseol_green_tea_leaves.jpg", "Drying_jakseol_green_tea_leaves.jpg"],
     taste: ["savory", "sweet"], caffeine: "need", purpose: ["focus", "gift"],
+    body: "light", aroma: "subtle", time: ["morning", "afternoon"], effort: "standard", level: "intermediate",
     effect: "떫지 않고 감칠맛이 강한 첫물차. 카테킨이 풍부해 각성·항산화에 도움.",
     brew: "70°C 물, 찻잎 3g, 1분 30초",
     options: [{ weight: "50g", price: 25000 }, { weight: "100g", price: 40000 }],
@@ -34,6 +74,7 @@ const TEAS = [
   { id: "boseong-sejak", name: "보성 세작 녹차", origin: "국내 · 전남 보성", category: "녹차",
     images: ["Boseong_banner_Green_Tea_Plantation.jpg", "Green_tea_leaves.jpg"],
     taste: ["astringent", "savory"], caffeine: "need", purpose: ["focus"],
+    body: "medium", aroma: "clear", time: ["afternoon"], effort: "standard", level: "beginner",
     effect: "우전보다 진한 떫은맛과 개운한 뒷맛. 식사 후 입가심에 좋음.",
     brew: "75°C 물, 찻잎 3g, 1분",
     options: [{ weight: "100g", price: 15000 }, { weight: "200g", price: 25000 }],
@@ -41,6 +82,7 @@ const TEAS = [
   { id: "hadong-hwangcha", name: "하동 황차", origin: "국내 · 경남 하동", category: "발효차",
     images: ["Hwangcha.jpg", "Korean tea hwangcha Naju South Korea 2015-01-17(3).jpg"],
     taste: ["sweet", "savory"], caffeine: "need", purpose: ["digest", "relax"],
+    body: "medium", aroma: "clear", time: ["afternoon", "evening"], effort: "standard", level: "intermediate",
     effect: "약발효로 떫은맛을 낮추고 단맛을 살린 차. 위에 부담이 적어 공복에도 무난.",
     brew: "85°C 물, 찻잎 3g, 2분",
     options: [{ weight: "50g", price: 20000 }, { weight: "100g", price: 30000 }],
@@ -48,6 +90,7 @@ const TEAS = [
   { id: "yunnan-puer", name: "윈난 보이차(숙차)", origin: "해외 · 중국 윈난성", category: "발효차",
     images: ["Pu-erh_tea.JPG", "Pu-erh_tea_back.JPG"],
     taste: ["savory"], caffeine: "need", purpose: ["digest", "health"],
+    body: "full", aroma: "bold", time: ["afternoon", "evening"], effort: "ritual", level: "advanced",
     effect: "후발효차 특유의 흙내와 구수함. 기름진 음식 후 소화를 돕는다고 알려짐.",
     brew: "95°C 물, 찻잎 5g, 세차 후 20~30초씩 여러 번",
     options: [{ weight: "병차 100g", price: 30000 }, { weight: "병차 357g", price: 80000 }],
@@ -55,6 +98,7 @@ const TEAS = [
   { id: "taiwan-oolong", name: "대만 동방미인 우롱차", origin: "해외 · 대만 신주", category: "우롱차",
     images: ["Oolong_tea_leaf.jpg", "HGY_Oolong_tea_leaf_close.jpg"],
     taste: ["floral", "sweet"], caffeine: "any", purpose: ["gift", "relax"],
+    body: "medium", aroma: "bold", time: ["afternoon"], effort: "standard", level: "intermediate",
     effect: "진딧물이 문 잎으로 만들어 과일·꿀 향이 강한 고급 반발효차.",
     brew: "90°C 물, 찻잎 4g, 1분",
     options: [{ weight: "50g", price: 40000 }, { weight: "100g", price: 70000 }],
@@ -62,6 +106,7 @@ const TEAS = [
   { id: "darjeeling", name: "다르질링 홍차(퍼스트 플러시)", origin: "해외 · 인도 다르질링", category: "홍차",
     images: ["Darjeeling-tea-first-flush-in-cup.jpg", "Darjeeling, India, Darjeeling tea.jpg"],
     taste: ["tangy", "astringent"], caffeine: "need", purpose: ["focus"],
+    body: "light", aroma: "bold", time: ["morning", "afternoon"], effort: "standard", level: "intermediate",
     effect: "머스캣 포도 향과 산뜻한 산미. '홍차의 샴페인'으로 불림.",
     brew: "90°C 물, 찻잎 3g, 3분",
     options: [{ weight: "50g", price: 20000 }, { weight: "100g", price: 40000 }],
@@ -69,6 +114,7 @@ const TEAS = [
   { id: "breakfast-blend", name: "잉글리시 브렉퍼스트 블렌드", origin: "해외 · 인도·스리랑카 블렌드", category: "홍차",
     images: ["Cup_of_black_tea.JPG", "A_cup_of_Tea.jpg"],
     taste: ["astringent", "sweet"], caffeine: "need", purpose: ["focus"],
+    body: "full", aroma: "clear", time: ["morning"], effort: "standard", level: "beginner",
     effect: "진하고 묵직한 바디감. 우유·설탕과 잘 어울려 아침 각성용으로 적합.",
     brew: "100°C 물, 찻잎 3g, 3~4분",
     options: [{ weight: "100g", price: 12000 }, { weight: "200g", price: 20000 }],
@@ -76,6 +122,7 @@ const TEAS = [
   { id: "chrysanthemum", name: "국화차", origin: "국내 · 전북 정읍", category: "화차",
     images: ["Korean_chrysanthemum_tea-Gukhwacha-01.jpg", "Chrysanthemum_tea.JPG"],
     taste: ["floral", "sweet"], caffeine: "free", purpose: ["relax", "health"],
+    body: "light", aroma: "subtle", time: ["evening"], effort: "easy", level: "beginner",
     effect: "은은한 단향과 무카페인. 눈의 피로와 열감을 내리는 데 전통적으로 쓰임.",
     brew: "90°C 물, 꽃 4~5송이, 3분",
     options: [{ weight: "30g", price: 15000 }, { weight: "60g", price: 25000 }],
@@ -83,6 +130,7 @@ const TEAS = [
   { id: "yuja", name: "유자차", origin: "국내 · 전남 고흥", category: "과일청차",
     images: ["Korean tea-Yujacha-02.jpg", "Korean tea-Yujacha-05.jpg"],
     taste: ["sweet", "tangy"], caffeine: "free", purpose: ["health", "gift"],
+    body: "medium", aroma: "bold", time: ["afternoon", "evening"], effort: "easy", level: "beginner",
     effect: "비타민C가 풍부한 유자청을 끓는 물에 타 마시는 형태. 환절기 목 관리용으로 인기.",
     brew: "뜨거운 물 200ml + 유자청 2스푼",
     options: [{ weight: "500g", price: 12000 }, { weight: "1kg", price: 18000 }],
@@ -90,6 +138,7 @@ const TEAS = [
   { id: "chamomile", name: "캐모마일", origin: "해외 · 이집트", category: "허브차",
     images: ["Loose_chamomile_tea.jpg"],
     taste: ["floral", "sweet"], caffeine: "free", purpose: ["relax"],
+    body: "light", aroma: "subtle", time: ["evening"], effort: "easy", level: "beginner",
     effect: "사과 같은 은은한 단향. 잠들기 전 마시는 허브차로 가장 널리 알려짐.",
     brew: "95°C 물, 꽃 2g, 4분",
     options: [{ weight: "20티백", price: 10000 }, { weight: "40티백", price: 18000 }],
@@ -97,6 +146,7 @@ const TEAS = [
   { id: "peppermint", name: "페퍼민트", origin: "해외 · 모로코", category: "허브차",
     images: ["Peppermint-tea_hg.jpg", "Tunisia-09-mint tea (6493856887).jpg"],
     taste: ["tangy"], caffeine: "free", purpose: ["digest"],
+    body: "light", aroma: "bold", time: ["afternoon", "evening"], effort: "easy", level: "beginner",
     effect: "시원한 멘톨 향이 소화를 돕고 속을 편하게 함. 식후 차로 적합.",
     brew: "95°C 물, 잎 2g, 3분",
     options: [{ weight: "20티백", price: 9000 }, { weight: "40티백", price: 15000 }],
@@ -104,6 +154,7 @@ const TEAS = [
   { id: "rooibos", name: "루이보스", origin: "해외 · 남아프리카공화국", category: "허브차",
     images: ["Rooibos_tea_in_a_glass_with_dry_rooibos.jpg", "Rooibos_tea_2.jpg"],
     taste: ["sweet", "savory"], caffeine: "free", purpose: ["health"],
+    body: "medium", aroma: "subtle", time: ["evening"], effort: "easy", level: "beginner",
     effect: "카페인 없이도 은은한 단맛. 항산화 성분이 풍부해 다이어트·컨디션 관리용으로 인기.",
     brew: "100°C 물, 찻잎 3g, 5분(오래 우려도 안 떫음)",
     options: [{ weight: "100g", price: 13000 }, { weight: "200g", price: 20000 }],
@@ -111,6 +162,7 @@ const TEAS = [
   { id: "gyeolmyeongja", name: "결명자차", origin: "국내 · 충남 태안", category: "허브차",
     images: [],
     taste: ["savory"], caffeine: "free", purpose: ["health", "relax"],
+    body: "medium", aroma: "clear", time: ["afternoon", "evening"], effort: "standard", level: "beginner",
     effect: "구수한 볶은 맛. 예로부터 눈 건강과 이뇨 작용에 좋다고 알려진 전통 약차.",
     brew: "물 1L에 결명자 15g, 10분 끓이기",
     options: [{ weight: "200g", price: 8000 }, { weight: "500g", price: 13000 }],
@@ -118,6 +170,7 @@ const TEAS = [
   { id: "jasmine", name: "자스민 화차", origin: "국내 재가공 · 중국 푸젠성 원료", category: "화차",
     images: ["Jasmine_tea.jpg", "Jasmine_Flower_Tea.jpg"],
     taste: ["floral"], caffeine: "any", purpose: ["relax", "gift"],
+    body: "light", aroma: "bold", time: ["afternoon"], effort: "standard", level: "beginner",
     effect: "녹차에 자스민 꽃향을 입힌 차. 가볍고 산뜻해 식사 자리에 두루 잘 어울림.",
     brew: "85°C 물, 찻잎 3g, 2분",
     options: [{ weight: "50g", price: 15000 }, { weight: "100g", price: 25000 }],
